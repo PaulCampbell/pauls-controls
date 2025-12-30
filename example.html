@@ -2,13 +2,23 @@
 <html lang="en">
 	<head>
 		<meta charset="utf-8" />
-		<title>PaulsControls</title>
+		<title>pauls-controls</title>
 		<style>
 			body {
 				font-family: sans-serif;
 				margin: 2rem;
 				background: #0f2a16;
 				color: #e2e8f0;
+			}
+
+			code {
+				display: block;
+				background: #1e293b;
+				padding: 0.2rem 0.4rem;
+				border-radius: 4px;
+				border: solid 1px #334155;
+				font-size: 0.9rem;
+				font-family: 'Courier New', Courier, monospace;
 			}
 
 			bounding-boxes {
@@ -18,48 +28,54 @@
 				overflow: hidden;
 				box-shadow: 0 8px 30px rgba(15, 23, 42, 0.35);
 			}
+
+			.component {
+				margin-bottom: 4rem;
+				padding-bottom: 2rem;
+				border-bottom: 1px solid #334155;
+			}	
 		</style>
 	</head>
 	<body>
 		<div>
-			<h1 id="introduction">PaulsControls Demo</h1>
+			<h1 id="introduction">pauls-controls Demo</h1>
 			<p>
 				Simple web components for when you&apos;re sick of wrangling frameworks
 			</p>
 			<ul>
-				<li><a href="#autosuggest">Autosuggest Component</a></li>
-				<li><a href="#bounding-boxes">Bounding Boxes Component</a></li>
+				<li><a href="#autosuggest">auto-suggest component</a></li>
+				<li><a href="#bounding-boxes">bounding-boxes component</a></li>
 			</ul>
 		</div>
 
 
-		<div>
-			<h2 id="autosuggest">Autosuggest Component Demo</h2>
+		<div class="component">
+			<h2 id="autosuggest">auto-suggest</h2>
 			<p>
 				The autosuggest component provides a text input with suggestions dropdown.
 			</p>
 			<pre>
 			<code>
-	&lt;auto-suggest
-		items='[
-			"Apple", 
-			"Banana",
-			"Cherry", 
-			"Date", 
-			"Elderberry", 
-			"Fig", 
-			"Grape", 
-			"Honeydew"
-		]'
-	&gt;&lt;/auto-suggest&gt;
+&lt;auto-suggest
+	items='[
+		"Apple", 
+		"Banana",
+		"Cherry", 
+		"Date", 
+		"Elderberry", 
+		"Fig", 
+		"Grape", 
+		"Honeydew"
+	]'
+&gt;&lt;/auto-suggest&gt;
 
-	&lt;script type="module"&gt;
-		import './src/auto-suggest.js';
-		const autosuggest = document.querySelector('auto-suggest');
-		autosuggest?.addEventListener('selectionchange', (event) => {
-			console.log('Selection changed:', event.detail.selection);
-		});
-	&lt;/script&gt;
+&lt;script type="module"&gt;
+	import './src/auto-suggest.js';
+	const autosuggest = document.querySelector('auto-suggest');
+	autosuggest?.addEventListener('selectionchange', (event) => {
+		console.log('Selection changed:', event.detail.selection);
+	});
+&lt;/script&gt;
 			</code>
 			</pre>
 			
@@ -78,8 +94,8 @@
 		</div>
 
 
-		<div>
-			<h2 id="bounding-boxes">Bounding Boxes Component Demo</h2>
+		<div class="component">
+			<h2 id="bounding-boxes">bounding-boxes</h2>
 			<p>
 				The component expects bounding boxes in <abbr title="You Only Look Once">YOLO</abbr> format
 				(centre&nbsp;X, centre&nbsp;Y, width, height) with all values normalised between 0 and 1.
@@ -87,6 +103,46 @@
 			<p>
 				The component optionally supports an autosuggest feature for labeling boxes.
 			</p>
+
+			<pre>
+				<code>
+&lt;bounding-boxes
+	src="muppets.jpg"
+	boxes='[
+		{
+			"xPosition": 0.6182206444474247,
+			"yPosition": 0.4021144903858238,
+			"width": 0.4422906048819742,
+			"height": 0.6912467010179716,
+			"label": "Pig"
+		},
+		{
+			"xPosition": 0.10062365879828326,
+			"yPosition": 0.5866061329646852,
+			"width": 0.18412184817596566,
+			"height": 0.3743684805831343,
+			"label": "Chicken"
+		}
+	]'
+	autosuggestItems='[
+	  "Pig", 
+	  "Chicken", 
+	  "Frog", 
+	  "Rabbit", 
+	  "Totoise"
+	]'
+&gt;&lt;/bounding-boxes&gt;
+
+&lt;script type="module"&gt;
+	import './src/bounding-boxes.js';
+
+	const viewer = document.querySelector('bounding-boxes');
+	viewer?.addEventListener('boxeschange', (event) => {
+		console.log('Boxes updated:', event.detail.boxes);
+	});
+&lt;/script&gt;
+				</code>
+			</pre>
 			<bounding-boxes
 				src="muppets.jpg"
 				boxes='[

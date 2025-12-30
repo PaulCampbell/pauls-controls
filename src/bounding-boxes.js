@@ -1,4 +1,5 @@
 import './auto-suggest.js';
+import { emit, normalizeStringArray, parseJsonAttribute } from './component-utils.js';
 
 const COLOR_PALETTE = ['#f97316', '#ef4444', '#eab308', '#22c55e', '#0ea5e9', '#a855f7'];
 const DEFAULT_COLOR = '#00ff88';
@@ -303,33 +304,13 @@ export class BoundingBoxesElement extends HTMLElement {
 			return;
 		}
 
-		try {
-			const parsed = JSON.parse(value);
-			this._autosuggestItems = this._normalizeAutosuggestItems(parsed);
-		} catch (error) {
-			console.warn('Unable to parse `autosuggestitems` attribute. Expecting valid JSON.', error);
-			this._autosuggestItems = [];
-		}
+		const parsed = parseJsonAttribute(value, {
+			fallback: [],
+			warnLabel: 'Unable to parse `autosuggestitems` attribute. Expecting valid JSON.',
+		});
+		this._autosuggestItems = normalizeStringArray(parsed);
 
 		this._renderActiveOverlay();
-	}
-
-	_normalizeAutosuggestItems(items) {
-		if (!Array.isArray(items)) {
-			return [];
-		}
-
-		return items
-			.map((item) => {
-				if (typeof item === 'string') {
-					return item.trim();
-				}
-				if (item == null) {
-					return '';
-				}
-				return String(item).trim();
-			})
-			.filter((item) => item.length > 0);
 	}
 
 	set autosuggestItems(value) {
@@ -337,8 +318,7 @@ export class BoundingBoxesElement extends HTMLElement {
 			console.warn('`autosuggestItems` must be an array.');
 			return;
 		}
-
-		const normalized = this._normalizeAutosuggestItems(value);
+		const normalized = normalizeStringArray(value);
 		this._autosuggestItems = normalized;
 
 		if (!this._isUpdatingAutosuggestAttribute) {
@@ -368,13 +348,11 @@ export class BoundingBoxesElement extends HTMLElement {
 			return;
 		}
 
-		try {
-			const parsed = JSON.parse(value);
-			this.boxes = Array.isArray(parsed) ? parsed : [];
-		} catch (error) {
-			console.warn('Unable to parse `boxes` attribute. Expecting valid JSON.', error);
-			this.boxes = [];
-		}
+		const parsed = parseJsonAttribute(value, {
+			fallback: [],
+			warnLabel: 'Unable to parse `boxes` attribute. Expecting valid JSON.',
+		});
+		this.boxes = Array.isArray(parsed) ? parsed : [];
 	}
 
 	async _loadImage(src) {
@@ -1117,15 +1095,9 @@ export class BoundingBoxesElement extends HTMLElement {
 	}
 
 	_dispatchBoxesChanged() {
-		this.dispatchEvent(
-			new CustomEvent('boxeschange', {
-				detail: {
-					boxes: this._boxes.map((box) => ({ ...box })),
-				},
-				bubbles: true,
-				composed: true,
-			})
-		);
+		emit(this, 'boxeschange', {
+			boxes: this._boxes.map((box) => ({ ...box })),
+		});
 	}
 
 	_getDisplayScale() {

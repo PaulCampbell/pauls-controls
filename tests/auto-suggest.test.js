@@ -66,4 +66,18 @@ describe('<auto-suggest>', () => {
     label.remove();
     labeledElement.remove();
   });
+
+  it('mirrors the host id onto the internal input', () => {
+    const withId = document.createElement('auto-suggest');
+    withId.id = 'my-autosuggest';
+    withId.setAttribute('items', JSON.stringify(['Apple']));
+    document.body.append(withId);
+
+    expect(withId.inputElement.id).toBe('my-autosuggest');
+
+    withId.id = '';
+    expect(withId.inputElement.hasAttribute('id')).toBe(false);
+
+    withId.remove();
+  });
 });

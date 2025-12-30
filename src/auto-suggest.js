@@ -1,3 +1,5 @@
+import { emit, parseJsonAttribute, upgradeProperty } from './component-utils.js';
+
 const template = document.createElement('template');
 
 template.innerHTML = `
@@ -95,6 +97,8 @@ export class AutoSuggestElement extends HTMLElement {
     this._input = this.shadowRoot.querySelector('input');
     this._suggestions = this.shadowRoot.querySelector('.suggestions');
 
+    this._applyInputId();
+
     this._handleInput = this._handleInput.bind(this);
     this._handleFocus = this._handleFocus.bind(this);
     this._handleBlur = this._handleBlur.bind(this);
@@ -105,10 +109,10 @@ export class AutoSuggestElement extends HTMLElement {
   }
 
   connectedCallback() {
-    this._upgradeProperty('items');
-    this._upgradeProperty('value');
-    this._upgradeProperty('placeholder');
-    this._upgradeProperty('id');
+    upgradeProperty(this, 'items');
+    upgradeProperty(this, 'value');
+    upgradeProperty(this, 'placeholder');
+    upgradeProperty(this, 'id');
 
     if (!this.hasAttribute('tabindex')) {
       this.tabIndex = 0;
@@ -124,6 +128,7 @@ export class AutoSuggestElement extends HTMLElement {
     this.addEventListener('focus', this._handleHostFocus);
 
     this._syncAssociatedLabels(true);
+    this._applyInputId();
 
     this._applyPlaceholder();
     this._updateFilteredItems();
@@ -158,6 +163,7 @@ export class AutoSuggestElement extends HTMLElement {
 
     if (name === 'id') {
       this._syncAssociatedLabels();
+      this._applyInputId();
     }
   }
 
@@ -209,14 +215,6 @@ export class AutoSuggestElement extends HTMLElement {
 
   reportValidity() {
     return this._input.reportValidity();
-  }
-
-  _upgradeProperty(prop) {
-    if (Object.prototype.hasOwnProperty.call(this, prop)) {
-      const value = this[prop];
-      delete this[prop];
-      this[prop] = value;
-    }
   }
 
   _handleInput(event) {
@@ -331,13 +329,7 @@ export class AutoSuggestElement extends HTMLElement {
   }
 
   _emitValueChange(value, cause = 'input') {
-    this.dispatchEvent(
-      new CustomEvent('valuechange', {
-        detail: { value, cause },
-        bubbles: true,
-        composed: true,
-      })
-    );
+    emit(this, 'valuechange', { value, cause });
   }
 
   _updateFilteredItems(query = this.value) {
@@ -376,20 +368,21 @@ export class AutoSuggestElement extends HTMLElement {
   }
 
   _parseItems(value) {
-    if (!value) {
-      return [];
-    }
-
-    try {
-      const parsed = JSON.parse(value);
-      return Array.isArray(parsed) ? parsed.map((v) => `${v}`) : [];
-    } catch (error) {
-      return [];
-    }
+    const parsed = parseJsonAttribute(value, { fallback: [] });
+    return Array.isArray(parsed) ? parsed.map((v) => `${v}`) : [];
   }
 
   _applyPlaceholder() {
     this._input.placeholder = this._placeholder || '';
+  }
+
+  _applyInputId() {
+    const id = this.id;
+    if (id) {
+      this._input.id = id;
+    } else {
+      this._input.removeAttribute('id');
+    }
   }
 
   _disconnectAssociatedLabels() {

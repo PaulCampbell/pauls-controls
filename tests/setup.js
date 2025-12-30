@@ -3,20 +3,35 @@ import { Window } from 'happy-dom';
 const windowInstance = new Window();
 const { document } = windowInstance;
 
-Object.assign(globalThis, {
-  window: windowInstance,
-  document,
-  navigator: windowInstance.navigator,
-  customElements: windowInstance.customElements,
-  HTMLElement: windowInstance.HTMLElement,
-  HTMLTemplateElement: windowInstance.HTMLTemplateElement,
-  HTMLCanvasElement: windowInstance.HTMLCanvasElement,
-  Event: windowInstance.Event,
-  CustomEvent: windowInstance.CustomEvent,
-  KeyboardEvent: windowInstance.KeyboardEvent,
-  MouseEvent: windowInstance.MouseEvent,
-  PointerEvent: windowInstance.PointerEvent,
-});
+const defineGlobal = (key, value) => {
+  try {
+    const existing = Object.getOwnPropertyDescriptor(globalThis, key);
+    if (existing && existing.configurable === false) {
+      return;
+    }
+
+    Object.defineProperty(globalThis, key, {
+      value,
+      writable: true,
+      configurable: true,
+    });
+  } catch {
+    // Ignore failures for non-configurable globals.
+  }
+};
+
+defineGlobal('window', windowInstance);
+defineGlobal('document', document);
+defineGlobal('navigator', windowInstance.navigator);
+defineGlobal('customElements', windowInstance.customElements);
+defineGlobal('HTMLElement', windowInstance.HTMLElement);
+defineGlobal('HTMLTemplateElement', windowInstance.HTMLTemplateElement);
+defineGlobal('HTMLCanvasElement', windowInstance.HTMLCanvasElement);
+defineGlobal('Event', windowInstance.Event);
+defineGlobal('CustomEvent', windowInstance.CustomEvent);
+defineGlobal('KeyboardEvent', windowInstance.KeyboardEvent);
+defineGlobal('MouseEvent', windowInstance.MouseEvent);
+defineGlobal('PointerEvent', windowInstance.PointerEvent);
 
 if (!globalThis.requestAnimationFrame) {
   globalThis.requestAnimationFrame = (callback) => setTimeout(() => callback(Date.now()), 16);

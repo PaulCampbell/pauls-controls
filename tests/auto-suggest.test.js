@@ -1,4 +1,4 @@
-import { describe, it, expect, beforeEach, afterEach } from 'vitest';
+import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
 import './setup.js';
 import '../src/auto-suggest.js';
 
@@ -45,5 +45,25 @@ describe('<auto-suggest>', () => {
     expect(input.value).toBe('Dog');
     const suggestionsContainer = element.shadowRoot.querySelector('.suggestions');
     expect(suggestionsContainer.children).toHaveLength(0);
+  });
+
+  it('focuses when clicking a label with matching for/id', () => {
+    const label = document.createElement('label');
+    label.htmlFor = 'fruit-input';
+    label.textContent = 'Choose a fruit';
+
+    const labeledElement = document.createElement('auto-suggest');
+    labeledElement.id = 'fruit-input';
+    labeledElement.setAttribute('items', JSON.stringify(['Apple', 'Banana']));
+
+    document.body.append(label, labeledElement);
+
+    const focusSpy = vi.spyOn(labeledElement, 'focus');
+    label.dispatchEvent(new MouseEvent('click', { bubbles: true, cancelable: true }));
+
+    expect(focusSpy).toHaveBeenCalled();
+
+    label.remove();
+    labeledElement.remove();
   });
 });

@@ -63,8 +63,10 @@ template.innerHTML = `
 `;
 
 export class AutoSuggestElement extends HTMLElement {
+  static formAssociated = true;
+
   static get observedAttributes() {
-    return ['items', 'value', 'placeholder'];
+    return ['items', 'value', 'placeholder', 'id'];
   }
 
   constructor() {
@@ -75,7 +77,19 @@ export class AutoSuggestElement extends HTMLElement {
     this._highlightedIndex = -1;
     this._open = false;
 
-    this.attachShadow({ mode: 'open' });
+    this._internals = null;
+    if (typeof this.attachInternals === 'function') {
+      try {
+        this._internals = this.attachInternals();
+      } catch {
+        this._internals = null;
+      }
+    }
+
+    this._labelClickHandlers = new Map();
+    this._lastAssociatedLabelFor = null;
+
+    this.attachShadow({ mode: 'open', delegatesFocus: true });
     this.shadowRoot.appendChild(template.content.cloneNode(true));
 
     this._input = this.shadowRoot.querySelector('input');
@@ -87,12 +101,18 @@ export class AutoSuggestElement extends HTMLElement {
     this._handleKeyDown = this._handleKeyDown.bind(this);
     this._handleSuggestionClick = this._handleSuggestionClick.bind(this);
     this._handleExternalPointerDown = this._handleExternalPointerDown.bind(this);
+    this._handleHostFocus = this._handleHostFocus.bind(this);
   }
 
   connectedCallback() {
     this._upgradeProperty('items');
     this._upgradeProperty('value');
     this._upgradeProperty('placeholder');
+    this._upgradeProperty('id');
+
+    if (!this.hasAttribute('tabindex')) {
+      this.tabIndex = 0;
+    }
 
     this._input.addEventListener('input', this._handleInput);
     this._input.addEventListener('focus', this._handleFocus);
@@ -100,6 +120,10 @@ export class AutoSuggestElement extends HTMLElement {
     this._input.addEventListener('keydown', this._handleKeyDown);
     this._suggestions.addEventListener('pointerdown', this._handleSuggestionClick);
     document.addEventListener('pointerdown', this._handleExternalPointerDown);
+
+    this.addEventListener('focus', this._handleHostFocus);
+
+    this._syncAssociatedLabels(true);
 
     this._applyPlaceholder();
     this._updateFilteredItems();
@@ -113,6 +137,10 @@ export class AutoSuggestElement extends HTMLElement {
     this._input.removeEventListener('keydown', this._handleKeyDown);
     this._suggestions.removeEventListener('pointerdown', this._handleSuggestionClick);
     document.removeEventListener('pointerdown', this._handleExternalPointerDown);
+
+    this.removeEventListener('focus', this._handleHostFocus);
+
+    this._disconnectAssociatedLabels();
   }
 
   attributeChangedCallback(name, _oldValue, newValue) {
@@ -126,6 +154,10 @@ export class AutoSuggestElement extends HTMLElement {
 
     if (name === 'placeholder') {
       this.placeholder = newValue ?? '';
+    }
+
+    if (name === 'id') {
+      this._syncAssociatedLabels();
     }
   }
 
@@ -358,6 +390,63 @@ export class AutoSuggestElement extends HTMLElement {
 
   _applyPlaceholder() {
     this._input.placeholder = this._placeholder || '';
+  }
+
+  _disconnectAssociatedLabels() {
+    for (const [label, handler] of this._labelClickHandlers.entries()) {
+      label.removeEventListener('click', handler);
+    }
+    this._labelClickHandlers.clear();
+    this._lastAssociatedLabelFor = null;
+  }
+
+  _handleHostFocus() {
+    this._input.focus({ preventScroll: true });
+  }
+
+  _syncAssociatedLabels(force = false) {
+    const id = this.id;
+    if (!id) {
+      this._disconnectAssociatedLabels();
+      return;
+    }
+
+    if (!force && id === this._lastAssociatedLabelFor) {
+      return;
+    }
+
+    this._disconnectAssociatedLabels();
+    this._lastAssociatedLabelFor = id;
+
+    // If the element is form-associated, native label behavior should work in
+    // modern browsers. This is a fallback for environments that don't support it.
+    const labels = new Set();
+    try {
+      if (typeof this._internals?.labels?.values === 'function') {
+        for (const label of this._internals.labels) {
+          labels.add(label);
+        }
+      }
+
+      const escape = globalThis.CSS?.escape ? globalThis.CSS.escape : (value) => `${value}`;
+      for (const label of document.querySelectorAll(`label[for="${escape(id)}"]`)) {
+        labels.add(label);
+      }
+    } catch {
+      // ignore
+    }
+
+    for (const label of labels) {
+      if (!(label instanceof HTMLElement)) {
+        continue;
+      }
+      const handler = (event) => {
+        event.preventDefault();
+        this.focus({ preventScroll: true });
+      };
+      label.addEventListener('click', handler);
+      this._labelClickHandlers.set(label, handler);
+    }
   }
 }
 

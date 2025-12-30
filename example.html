@@ -2,7 +2,7 @@
 <html lang="en">
 	<head>
 		<meta charset="utf-8" />
-		<title>Bounding Boxes Component Demo</title>
+		<title>PaulsControls</title>
 		<style>
 			body {
 				font-family: sans-serif;
@@ -21,42 +21,102 @@
 		</style>
 	</head>
 	<body>
-		<h1>Bounding Boxes Component Demo</h1>
-		<p>
-			The component expects bounding boxes in <abbr title="You Only Look Once">YOLO</abbr> format
-			(centre&nbsp;X, centre&nbsp;Y, width, height) with all values normalised between 0 and 1.
-		</p>
-        <p>
-			The component optionally supports an autosuggest feature for labeling boxes.
-		</p>
-		<bounding-boxes
-			src="muppets.jpg"
-			boxes='[
-                {
-                    "xPosition": 0.6182206444474247,
-                    "yPosition": 0.4021144903858238,
-                    "width": 0.4422906048819742,
-                    "height": 0.6912467010179716,
-                    "label": "Pig"
-                },
-                {
-                    "xPosition": 0.10062365879828326,
-                    "yPosition": 0.5866061329646852,
-                    "width": 0.18412184817596566,
-                    "height": 0.3743684805831343,
-                    "label": "Chicken"
-                }
-            ]'
-			autosuggestItems='["Pig", "Chicken", "Frog", "Rabbit", "Totoise"]'
-		></bounding-boxes>
+		<div>
+			<h1 id="introduction">PaulsControls Demo</h1>
+			<p>
+				Simple web components for when you&apos;re sick of wrangling frameworks
+			</p>
+			<ul>
+				<li><a href="#autosuggest">Autosuggest Component</a></li>
+				<li><a href="#bounding-boxes">Bounding Boxes Component</a></li>
+			</ul>
+		</div>
 
-		<script type="module">
-			import './src/bounding-boxes.js';
 
-			const viewer = document.querySelector('bounding-boxes');
-			viewer?.addEventListener('boxeschange', (event) => {
-				console.log('Boxes updated:', event.detail.boxes);
-			});
-		</script>
+		<div>
+			<h2 id="autosuggest">Autosuggest Component Demo</h2>
+			<p>
+				The autosuggest component provides a text input with suggestions dropdown.
+			</p>
+			<pre>
+			<code>
+	&lt;auto-suggest
+		items='[
+			"Apple", 
+			"Banana",
+			"Cherry", 
+			"Date", 
+			"Elderberry", 
+			"Fig", 
+			"Grape", 
+			"Honeydew"
+		]'
+	&gt;&lt;/auto-suggest&gt;
+
+	&lt;script type="module"&gt;
+		import './src/auto-suggest.js';
+		const autosuggest = document.querySelector('auto-suggest');
+		autosuggest?.addEventListener('selectionchange', (event) => {
+			console.log('Selection changed:', event.detail.selection);
+		});
+	&lt;/script&gt;
+			</code>
+			</pre>
+			
+			<label for="autosuggest-input">Choose a fruit:</label>
+			<auto-suggest
+				id="autosuggest-input"
+				items='["Apple", "Banana", "Cherry", "Date", "Elderberry", "Fig", "Grape", "Honeydew"]'
+			></auto-suggest>
+			<script type="module">
+				import './src/auto-suggest.js';
+				const autosuggest = document.querySelector('auto-suggest');
+				autosuggest?.addEventListener('selectionchange', (event) => {
+					console.log('Selection changed:', event.detail.selection);
+				});
+			</script>
+		</div>
+
+
+		<div>
+			<h2 id="bounding-boxes">Bounding Boxes Component Demo</h2>
+			<p>
+				The component expects bounding boxes in <abbr title="You Only Look Once">YOLO</abbr> format
+				(centre&nbsp;X, centre&nbsp;Y, width, height) with all values normalised between 0 and 1.
+			</p>
+			<p>
+				The component optionally supports an autosuggest feature for labeling boxes.
+			</p>
+			<bounding-boxes
+				src="muppets.jpg"
+				boxes='[
+					{
+						"xPosition": 0.6182206444474247,
+						"yPosition": 0.4021144903858238,
+						"width": 0.4422906048819742,
+						"height": 0.6912467010179716,
+						"label": "Pig"
+					},
+					{
+						"xPosition": 0.10062365879828326,
+						"yPosition": 0.5866061329646852,
+						"width": 0.18412184817596566,
+						"height": 0.3743684805831343,
+						"label": "Chicken"
+					}
+				]'
+				autosuggestItems='["Pig", "Chicken", "Frog", "Rabbit", "Totoise"]'
+			></bounding-boxes>
+
+			<script type="module">
+				import './src/bounding-boxes.js';
+
+				const viewer = document.querySelector('bounding-boxes');
+				viewer?.addEventListener('boxeschange', (event) => {
+					console.log('Boxes updated:', event.detail.boxes);
+				});
+			</script>
+		</div>
+		
 	</body>
 </html>

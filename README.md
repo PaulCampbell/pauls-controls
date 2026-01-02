@@ -8,6 +8,8 @@ Simple web components for when you&apos;re bored of wrangling frameworks.
 - `<bounding-boxes>`: Renders an image with YOLO-format bounding boxes (and optional label editing).
 - `<upload-input>`: Image upload input with drag-and-drop support and a square preview.
 
+See them in action here: https://paulcampbell.github.io/pauls-controls/
+
 ## Example
 
 Run a static server and open `example.html` to see all components in action.

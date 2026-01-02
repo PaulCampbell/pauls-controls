@@ -4,6 +4,9 @@
 		<meta charset="utf-8" />
 		<title>pauls-controls</title>
 		<style>
+			a {
+				color:#e2e8f0
+			}
 			body {
 				font-family: sans-serif;
 				margin: 2rem;
@@ -68,7 +71,7 @@
 &gt;&lt;/auto-suggest&gt;
 
 &lt;script type="module"&gt;
-	import './src/auto-suggest.js';
+	import './dist/auto-suggest.js';
 	const autosuggest = document.querySelector('auto-suggest');
 	autosuggest?.addEventListener('selectionchange', (event) => {
 		console.log('Selection changed:', event.detail.selection);
@@ -83,7 +86,7 @@
 				items='["Apple", "Banana", "Cherry", "Date", "Elderberry", "Fig", "Grape", "Honeydew"]'
 			></auto-suggest>
 			<script type="module">
-				import './src/auto-suggest.js';
+				import './dist/auto-suggest.js';
 				const autosuggest = document.querySelector('auto-suggest');
 				autosuggest?.addEventListener('selectionchange', (event) => {
 					console.log('Selection changed:', event.detail.selection);
@@ -132,7 +135,7 @@
 &gt;&lt;/bounding-boxes&gt;
 
 &lt;script type="module"&gt;
-	import './src/bounding-boxes.js';
+	import './dist/bounding-boxes.js';
 
 	const viewer = document.querySelector('bounding-boxes');
 	viewer?.addEventListener('boxeschange', (event) => {
@@ -163,7 +166,7 @@
 			></bounding-boxes>
 
 			<script type="module">
-				import './src/bounding-boxes.js';
+				import './dist/bounding-boxes.js';
 
 				const viewer = document.querySelector('bounding-boxes');
 				viewer?.addEventListener('boxeschange', (event) => {
@@ -187,7 +190,7 @@
 &lt;/form&gt;
 
 &lt;script type="module"&gt;
-	import './src/upload-input.js';
+	import './dist/upload-input.js';
 
 	const form = document.getElementById('uploadForm');
 	const uploader = document.querySelector('upload-input');
@@ -209,7 +212,7 @@
 			<upload-input></upload-input>
 
 			<script type="module">
-				import './src/upload-input.js';
+				import './dist/upload-input.js';
 
 				const uploader = document.querySelector('upload-input');
 				uploader?.addEventListener('image-loaded', (event) => {

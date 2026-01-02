@@ -1,7 +1,7 @@
 {
-  "name": "pauls-components",
+  "name": "pauls-controls",
   "version": "1.0.0",
-  "description": "Custom web components.",
+  "description": "Simple web components for when you're bored of wrangling frameworks.",
   "type": "module",
   "scripts": {
     "build": "node build.mjs",

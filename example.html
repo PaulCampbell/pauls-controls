@@ -39,12 +39,10 @@
 	<body>
 		<div>
 			<h1 id="introduction">pauls-controls Demo</h1>
-			<p>
-				Simple web components for when you&apos;re sick of wrangling frameworks
-			</p>
 			<ul>
 				<li><a href="#autosuggest">auto-suggest component</a></li>
 				<li><a href="#bounding-boxes">bounding-boxes component</a></li>
+				<li><a href="#upload-input">upload-input component</a></li>
 			</ul>
 		</div>
 
@@ -170,6 +168,53 @@
 				const viewer = document.querySelector('bounding-boxes');
 				viewer?.addEventListener('boxeschange', (event) => {
 					console.log('Boxes updated:', event.detail.boxes);
+				});
+			</script>
+		</div>
+
+		<div class="component">
+			<h2 id="upload-input">upload-input</h2>
+			<p>
+				The upload-input component provides an image upload interface with drag-and-drop support and a preview area.
+			</p>
+
+			<pre>
+				<code>
+
+&lt;form action="/upload" method="POST" enctype="multipart/form-data" id="uploadForm"&gt;
+  &lt;upload-input id="uploader"&gt;&lt;/upload-input&gt;
+  &lt;button type="submit"&gt;Upload&lt;/button&gt;
+&lt;/form&gt;
+
+&lt;script type="module"&gt;
+	import './src/upload-input.js';
+
+	const form = document.getElementById('uploadForm');
+	const uploader = document.querySelector('upload-input');
+	uploader?.addEventListener('image-loaded', (event) => {
+		console.log('Image loaded:', event.detail.file.name);
+		console.log('Data URL:', event.detail.dataUrl);
+	});
+
+	form.addEventListener("formdata", (event) => {
+		const file = uploader.getFile();
+		if (file) {
+			event.formData.append("image", file, file.name);
+		}
+	});
+&lt;/script&gt;
+				</code>
+			</pre>
+
+			<upload-input></upload-input>
+
+			<script type="module">
+				import './src/upload-input.js';
+
+				const uploader = document.querySelector('upload-input');
+				uploader?.addEventListener('image-loaded', (event) => {
+					console.log('Image loaded:', event.detail.file.name);
+					console.log('Data URL available:', event.detail.dataUrl ? 'yes' : 'no');
 				});
 			</script>
 		</div>

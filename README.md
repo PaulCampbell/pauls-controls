@@ -1,36 +1,58 @@
-# Bounding Boxes Web Component
+# pauls-controls
 
-`<bounding-boxes>` is a lightweight web component that renders an image and overlays YOLO-format bounding boxes with optional labels. It is designed for tagging and reviewing bounding boxes within browser-based tools, and includes a built-in UI for editing and creating boxes.
+Simple web components for when you&apos;re bored of wrangling frameworks.
+
+## Components
+
+- `<auto-suggest>`: Text input with a suggestions dropdown.
+- `<bounding-boxes>`: Renders an image with YOLO-format bounding boxes (and optional label editing).
+- `<upload-input>`: Image upload input with drag-and-drop support and a square preview.
 
 ## Example
 
-See it in action [here](https://paulcampbell.github.io/bounding-boxes-component/)
+Run a static server and open `example.html` to see all components in action.
 
-![bounding-boxes custom web component](demo.gif "Bounding Boxes Component")
+```
+npm run dev
+```
 
-
-## Features
-
-- Render an image onto a canvas with YOLO-format bounding boxes (center X/Y, width, height, all normalized 0–1).
-- Visual palette cycling for easy differentiation between boxes.
-- Click to select a box; edit labels inline, delete, or cancel edits.
-- Keyboard-friendly controls (Enter to save, Escape to cancel).
-- Add-tag mode with a dashed drag preview and copy cursor, creating blank labels ready for editing.
-- Emits a `boxeschange` event whenever boxes are added, updated, or deleted.
-- Optional autosuggest dropdown for labels, including keyboard navigation and type-ahead filtering.
+and go to http://127.0.0.1:8080/example.html
 
 ## Getting Started
 
 ```bash
 npm install
-npx http-server ./
+npm run build
+npm run dev
 ```
 
 1. Install dependencies (only needed for building/minifying).
-2. Run a static server (e.g. the command above) and open `example.html` to see the component in action.
-3. Modify the `boxes` attribute or set the `boxes` property to supply your own data.
+2. Build the components into `dist/`.
+3. Run a static server and open `example.html` to see the components in action.
+
 
 ## Usage
+
+Build outputs are ES modules in `dist/`. Import only the component(s) you need.
+
+### `<auto-suggest>`
+
+```html
+<script type="module" src="./dist/auto-suggest.js"></script>
+
+<auto-suggest
+  items='["Apple", "Banana", "Cherry"]'
+></auto-suggest>
+
+<script type="module">
+  const autosuggest = document.querySelector('auto-suggest');
+  autosuggest?.addEventListener('selectionchange', (event) => {
+    console.log('Selection changed:', event.detail.selection);
+  });
+</script>
+```
+
+### `<bounding-boxes>`
 
 ```html
 <script type="module" src="./dist/bounding-boxes.js"></script>
@@ -62,24 +84,18 @@ viewer.addEventListener('boxeschange', (event) => {
 });
 ```
 
-## Development
+### `<upload-input>`
 
-Source code lives in `src/bounding-boxes.js`. 
+```html
+<script type="module" src="./dist/upload-input.js"></script>
 
-```bash
-npm install
-npm run build    # produce dist/bounding-boxes.js
-npx http-server ./
+<upload-input></upload-input>
+
+<script type="module">
+  const uploader = document.querySelector('upload-input');
+  uploader?.addEventListener('image-loaded', (event) => {
+    console.log('Image loaded:', event.detail.file.name);
+    // event.detail.dataUrl is a data: URL for previewing
+  });
+</script>
 ```
-
-Open `example.html` in the browser.
-
-## Building
-
-This project uses [esbuild](https://esbuild.github.io/) to bundle and minify the component into `dist/bounding-boxes.js`.
-
-```bash
-npm run build
-```
-
-The build command creates the `dist` folder if needed, bundles the component starting from `src/bounding-boxes.js`, and produces a minified ES module suitable for distribution.

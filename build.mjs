@@ -10,27 +10,32 @@ const outputDir = path.dirname(outputPath);
 
 await mkdir(outputDir, { recursive: true });
 
-await build({
-  entryPoints: [
-    path.resolve(__dirname, 'src', 'bounding-boxes.js'),
-  ],
-  bundle: true,
-  minify: true,
-  format: 'esm',
-  outfile: path.resolve(__dirname, 'dist', 'bounding-boxes.js'),
-  sourcemap: false,
-  target: ['es2020'],
-});
+async function buildComponent(fileName) {
+    const buildOptions = {
+    bundle: true,
+    minify: true,
+    format: 'esm',
+    sourcemap: false,
+    target: ['es2020'],
+  }
 
-await build({
-  entryPoints: [
-    path.resolve(__dirname, 'src', 'auto-suggest.js'),
-  ],
-  bundle: true,
-  minify: true,
-  format: 'esm',
-  outfile: path.resolve(__dirname, 'dist', 'auto-suggest.js'),
-  sourcemap: false,
-  target: ['es2020'],
-});
+  await build({
+    ...buildOptions,
+    entryPoints: [
+      path.resolve(__dirname, 'src', fileName),
+    ],
+    outfile: path.resolve(__dirname, 'dist', fileName),
+  });
+}
 
+const components = [
+  'upload-input.js',
+  'bounding-boxes.js',
+  'auto-suggest.js',
+]
+
+for (const component of components) {
+  await buildComponent(component);
+}
+
+console.log('Build completed.');

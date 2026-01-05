@@ -5,7 +5,7 @@ Simple web components for when you&apos;re bored of wrangling frameworks.
 ## Components
 
 - `<auto-suggest>`: Text input with a suggestions dropdown.
-- `<bounding-boxes>`: Renders an image with YOLO-format bounding boxes (and optional label editing).
+- `<bounding-boxes>`: Renders an image with editable YOLO-format bounding boxes.
 - `<upload-input>`: Image upload input with drag-and-drop support and a square preview.
 
 See them in action here: https://paulcampbell.github.io/pauls-controls/
@@ -42,9 +42,7 @@ Build outputs are ES modules in `dist/`. Import only the component(s) you need.
 ```html
 <script type="module" src="./dist/auto-suggest.js"></script>
 
-<auto-suggest
-  items='["Apple", "Banana", "Cherry"]'
-></auto-suggest>
+<auto-suggest items='["Apple", "Banana", "Cherry"]' />
 
 <script type="module">
   const autosuggest = document.querySelector('auto-suggest');
@@ -64,8 +62,7 @@ Build outputs are ES modules in `dist/`. Import only the component(s) you need.
   boxes='[
     { "xPosition": 0.5, "yPosition": 0.5, "width": 0.3, "height": 0.2, "label": "bee" }
   ]'
-  autosuggestItems='["Bee", "Cat", "Dog"]'
-></bounding-boxes>
+  autosuggestItems='["Bee", "Cat", "Dog"]' />
 ```
 
 - `src`: Path to the image that should be rendered.
@@ -91,13 +88,17 @@ viewer.addEventListener('boxeschange', (event) => {
 ```html
 <script type="module" src="./dist/upload-input.js"></script>
 
-<upload-input></upload-input>
+<upload-input placeholder="./placeholder.png" />
 
 <script type="module">
   const uploader = document.querySelector('upload-input');
+  uploader.buttonText = 'Upload photo';
   uploader?.addEventListener('image-loaded', (event) => {
     console.log('Image loaded:', event.detail.file.name);
     // event.detail.dataUrl is a data: URL for previewing
   });
 </script>
 ```
+
+- `placeholder` (attribute): Optional image URL to show in the preview when no file is selected.
+- `buttonText` (property): Optional string to control the upload button label.

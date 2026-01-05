@@ -1,7 +1,11 @@
+import { upgradeProperty } from './component-utils.js';
 
-export function createUploadInput() {
+export function createUploadInput({ placeholder = '', buttonText = 'Choose Image' } = {}) {
   const container = document.createElement('div');
   container.className = 'upload-input-container';
+
+  let placeholderSrc = placeholder ?? '';
+  let uploadButtonText = buttonText ?? 'Choose Image';
   
   // Create preview area
   const preview = document.createElement('div');
@@ -29,7 +33,7 @@ export function createUploadInput() {
   const uploadButton = document.createElement('button');
   uploadButton.type = 'button';
   uploadButton.className = 'upload-button';
-  uploadButton.textContent = 'Choose Image';
+  uploadButton.textContent = uploadButtonText;
   
   inputWrapper.appendChild(fileInput);
   inputWrapper.appendChild(uploadButton);
@@ -54,13 +58,31 @@ export function createUploadInput() {
     };
     reader.readAsDataURL(file);
   }
+
+  function applyPlaceholderIfNeeded() {
+    if (fileInput.files && fileInput.files.length > 0) {
+      return;
+    }
+
+    if (placeholderSrc) {
+      previewImage.src = placeholderSrc;
+      preview.setAttribute('data-empty', 'false');
+      return;
+    }
+
+    previewImage.src = '';
+    preview.setAttribute('data-empty', 'true');
+  }
   
   // File input change handler
   fileInput.addEventListener('change', (e) => {
     const file = e.target.files[0];
     if (file) {
       handleFile(file);
+      return;
     }
+
+    applyPlaceholderIfNeeded();
   });
   
   // Button click handler
@@ -110,28 +132,57 @@ export function createUploadInput() {
       }
     }
   });
+
+  applyPlaceholderIfNeeded();
   
   // Public API
   return {
     element: container,
     getFile: () => fileInput.files[0],
+    setPlaceholder: (src) => {
+      placeholderSrc = src ?? '';
+      applyPlaceholderIfNeeded();
+    },
+    setButtonText: (text) => {
+      uploadButtonText = text ?? 'Choose Image';
+      uploadButton.textContent = uploadButtonText;
+    },
     clear: () => {
       fileInput.value = '';
-      previewImage.src = '';
-      preview.setAttribute('data-empty', 'true');
+      applyPlaceholderIfNeeded();
     }
   };
 }
 
 // Web Component wrapper
 export class UploadInput extends HTMLElement {
+  static get observedAttributes() {
+    return ['placeholder'];
+  }
+
   constructor() {
     super();
     this.attachShadow({ mode: 'open' });
+
+    this._placeholder = '';
+    this._buttonText = 'Choose Image';
+    this._component = null;
+  }
+
+  attributeChangedCallback(name, _oldValue, newValue) {
+    if (name === 'placeholder') {
+      this.placeholder = newValue ?? '';
+    }
   }
   
   connectedCallback() {
-    const component = createUploadInput();
+    upgradeProperty(this, 'placeholder');
+    upgradeProperty(this, 'buttonText');
+
+    const component = createUploadInput({
+      placeholder: this.placeholder,
+      buttonText: this.buttonText,
+    });
     
     // Add styles
     const style = document.createElement('style');
@@ -227,6 +278,24 @@ export class UploadInput extends HTMLElement {
         detail: e.detail
       }));
     });
+  }
+
+  get placeholder() {
+    return this._placeholder || '';
+  }
+
+  set placeholder(value) {
+    this._placeholder = value ?? '';
+    this._component?.setPlaceholder?.(this._placeholder);
+  }
+
+  get buttonText() {
+    return this._buttonText || 'Choose Image';
+  }
+
+  set buttonText(value) {
+    this._buttonText = value ?? 'Choose Image';
+    this._component?.setButtonText?.(this._buttonText);
   }
   
   getFile() {

@@ -182,7 +182,7 @@
 				<code>
 
 &lt;form action="/upload" method="POST" enctype="multipart/form-data" id="uploadForm"&gt;
-  &lt;upload-input id="uploader"&gt;&lt;/upload-input&gt;
+	&lt;upload-input id="uploader" placeholder="./placeholder.png"&gt;&lt;/upload-input&gt;
   &lt;button type="submit"&gt;Upload&lt;/button&gt;
 &lt;/form&gt;
 
@@ -191,6 +191,7 @@
 
 	const form = document.getElementById('uploadForm');
 	const uploader = document.querySelector('upload-input');
+	uploader.buttonText = 'Upload photo';
 	uploader?.addEventListener('image-loaded', (event) => {
 		console.log('Image loaded:', event.detail.file.name);
 		console.log('Data URL:', event.detail.dataUrl);
@@ -206,12 +207,13 @@
 				</code>
 			</pre>
 
-			<upload-input></upload-input>
+			<upload-input placeholder="./placeholder.png"></upload-input>
 
 			<script type="module">
 				import './src/upload-input.js';
 
 				const uploader = document.querySelector('upload-input');
+				uploader.buttonText = 'Upload photo';
 				uploader?.addEventListener('image-loaded', (event) => {
 					console.log('Image loaded:', event.detail.file.name);
 					console.log('Data URL available:', event.detail.dataUrl ? 'yes' : 'no');
